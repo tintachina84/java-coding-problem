@@ -3,14 +3,11 @@ package com.javacoding.app.Chapter09_Functional_Style_Programming;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
 
 import static java.util.Map.entry;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.mapping;
 import static java.util.stream.Collectors.toList;
-
-import java.util.Collection;
 
 // 매핑을 위한 스트리밍 커스텀 코드
 public class P186_StreamMapCustomMap {
