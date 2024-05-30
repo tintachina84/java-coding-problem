@@ -1,15 +1,14 @@
 package com.javacoding.app.Chapter09_Functional_Style_Programming;
 
-import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.function.BiPredicate;
-import java.util.function.Function;
 import java.util.function.Predicate;
 
-public class P195_BuildCustomPredicateMap {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class P196_LoggingPredicate {
 
     public static void main(String[] args) {
         List<Car> cars = Arrays.asList(new Car("Dacia", "diesel", 100),
@@ -19,21 +18,56 @@ public class P195_BuildCustomPredicateMap {
                 new Car("Mercedes", "electric", 200), new Car("Chevrolet", "gasoline", 350),
                 new Car("Lexus", "diesel", 300), new Car("Ford", "electric", 200));
 
-        Map<String, String> filtersMap = Map.of(
-                "brand", "Chevrolet",
-                "fuel", "diesel");
-
-        Predicate<Car> filterPredicate = t -> true;
-        // filterPredicate.and(...)를 호출하여 기존의 filterPredicate와 새로 생성한 Predicate를 AND
-        // 연산으로 결합한다. 결합된 Predicate는 두 Predicate 모두 참을 반환할 때만 참을 반환.
-        for (String key : filtersMap.keySet()) {
-            filterPredicate = filterPredicate.and(PredicateBuilder.EQUALS
-                    .toPredicate(PredicateBuilder.getFieldByName(Car.class, key), filtersMap.get(key)));
-        }
+        LogPredicate<Car> predicate = car -> car.getFuel().equals("electric");
 
         cars.stream()
-                .filter(filterPredicate)
+                .filter(t -> predicate.testAndLog(t, "electric"))
                 .forEach(System.out::println);
+
+        System.out.println();
+
+        cars.stream()
+                .filter(Predicates.testAndLog(car -> car.getFuel().equals("electric"), "electric"))
+                .forEach(System.out::println);
+    }
+
+    public final class Predicates {
+
+        private static final Logger logger = LoggerFactory.getLogger(LogPredicate.class);
+
+        private Predicates() {
+            throw new AssertionError("Cannot be instantiated");
+        }
+
+        public static <T> Predicate<T> testAndLog(Predicate<? super T> predicate, String val) {
+
+            return t -> {
+                boolean result = predicate.test(t);
+
+                if (!result) {
+                    logger.warn(predicate + " don't match '" + val + "'");
+                }
+
+                return result;
+            };
+        }
+    }
+
+    @FunctionalInterface
+    public interface LogPredicate<T> extends Predicate<T> {
+
+        Logger logger = LoggerFactory.getLogger(LogPredicate.class);
+
+        default boolean testAndLog(T t, String val) {
+
+            boolean result = this.test(t);
+
+            if (!result) {
+                logger.warn(t + " don't match '" + val + "'");
+            }
+
+            return result;
+        }
     }
 
     static class Car {
@@ -96,32 +130,4 @@ public class P195_BuildCustomPredicateMap {
         }
     }
 
-    enum PredicateBuilder {
-
-        EQUALS(String::equals);
-
-        private final BiPredicate<String, String> predicate;
-
-        private PredicateBuilder(BiPredicate<String, String> predicate) {
-            this.predicate = predicate;
-        }
-
-        public <T> Predicate<T> toPredicate(Function<T, String> getter, String u) {
-            return obj -> this.predicate.test(getter.apply(obj), u);
-        }
-
-        public static <T> Function<T, String> getFieldByName(Class<T> cls, String field) {
-            return object -> {
-                try {
-                    Field f = cls.getDeclaredField(field);
-                    f.setAccessible(true);
-
-                    return (String) f.get(object);
-                } catch (IllegalAccessException | IllegalArgumentException
-                        | NoSuchFieldException | SecurityException e) {
-                    throw new RuntimeException(e);
-                }
-            };
-        }
-    }
 }
