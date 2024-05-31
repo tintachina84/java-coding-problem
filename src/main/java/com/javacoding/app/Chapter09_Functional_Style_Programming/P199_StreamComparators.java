@@ -165,6 +165,8 @@ public class P199_StreamComparators {
 
         System.out.println();
 
+        // getFuel 메소드의 반환값을 기준으로 정렬하되, null인 Car 객체들이 마지막에 위치하도록 한다.
+        // 그리고 연료의 마지막 글자를 기준으로 정렬한다.
         cars.stream()
                 .sorted(Comparator.comparing(Car::getFuel,
                         Comparator.nullsLast(
