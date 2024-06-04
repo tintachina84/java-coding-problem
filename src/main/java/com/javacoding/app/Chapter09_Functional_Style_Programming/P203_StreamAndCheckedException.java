@@ -28,6 +28,8 @@ public class P203_StreamAndCheckedException {
             } catch (IOException e) {
                 // throw new RuntimeException(e);
                 // Exceptions.throwChecked(e);
+                // IOException과 같은 Checked Exception은 던질 수 없다. 컴파일 되지 않음.
+                // 다음과 같이 컴파일러에 대한 확인된 예외를 숨기면 Checked Exceptino 던지기 가능.
                 Exceptions.throwChecked(new IOException("Some files are corrupted", e));
             }
         });
