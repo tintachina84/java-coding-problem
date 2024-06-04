@@ -57,14 +57,14 @@ public class P204_StreamDistinctBy {
 
         System.out.println();
 
-        // null에는 작동 안 함
+        // null 제외 시킴
         cars.stream()
                 .filter(Streams.distinctByKeyV2(Car::getBrand))
                 .forEach(System.out::println);
 
         System.out.println();
 
-        // null에는 작동 안 함
+        // null 제외 시킴
         cars.stream()
                 .filter(Streams.distinctByKeyV3(Car::getFuel))
                 .forEach(System.out::println);
