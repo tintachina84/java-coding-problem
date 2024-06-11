@@ -1,4 +1,4 @@
-package com.javacoding.app.Chapter09_Functional_Style_Programming;
+package com.javacoding.app.Chapter10_Virtual_Thread_Structured_Concurrency;
 
 import java.io.IOException;
 import java.net.URI;
